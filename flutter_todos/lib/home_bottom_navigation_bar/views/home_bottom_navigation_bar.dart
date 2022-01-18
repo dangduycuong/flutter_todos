@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todos/home_bottom_navigation_bar/views/edit_todo_page.dart';
 import 'package:flutter_todos/stats/views/stats_page.dart';
 import 'package:flutter_todos/todos/views/add_todo_page.dart';
 import 'package:flutter_todos/todos/views/todos_page.dart';
@@ -18,7 +17,7 @@ class _HomePageBottomNavigationBarState
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    TodosView(),
+    TodosPage(),
     StatsPage(),
   ];
 
@@ -37,10 +36,10 @@ class _HomePageBottomNavigationBarState
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => AddTodoView(),
+            builder: (context) => const AddTodoView(),
           ),
         ),
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

@@ -13,10 +13,20 @@ class TodoAddEvent extends TodosEvent {
   List<Object> get props => [todo];
 }
 
-class TodoChangeStatusEvent extends TodosEvent {
+class TodosModifyEvent extends TodosEvent {
   final int index;
 
-  TodoChangeStatusEvent(this.index);
+  final Todo todo;
+
+  TodosModifyEvent(this.index, this.todo);
+
+  List<Object> get props => [index, todo];
+}
+
+class TodosDeleteEvent extends TodosEvent {
+  final int index;
+
+  TodosDeleteEvent(this.index);
 
   List<Object> get props => [index];
 }

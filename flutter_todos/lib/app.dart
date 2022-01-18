@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todos/home_bottom_navigation_bar/views/edit_todo_page.dart';
+
 import 'package:flutter_todos/todos/views/add_todo_page.dart';
+// import 'package:flutter_todos/todos/views/detail_todo_page.dart';
 
 import 'home_bottom_navigation_bar/views/home_bottom_navigation_bar.dart';
 
@@ -12,8 +13,8 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Timer',
       routes: {
-        EditTodoPage.routeName: (context) => const EditTodoPage(),
         AddTodoView.routeName: (context) => const AddTodoView(),
+        // TodoDetailPage.routeName: (context) => TodoDetailPage(),
       },
       theme: ThemeData(
         primaryColor: const Color.fromRGBO(109, 234, 255, 1),

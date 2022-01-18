@@ -10,7 +10,7 @@ class AddTodoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => TodosBloc(),
+      create: (_) => TodosBloc(),
       child: const AddTodoView(),
     );
   }
@@ -28,7 +28,8 @@ class AddTodoView extends StatefulWidget {
 class _AddTodoViewState extends State<AddTodoView> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _personFormKey = GlobalKey<FormState>();
+
+  // final _personFormKey = GlobalKey<FormState>();
   late final Box box;
 
   String? _fieldValidator(String? value) {
@@ -45,79 +46,97 @@ class _AddTodoViewState extends State<AddTodoView> {
       isCompleted: false,
     );
     // box.add(todo);
+    context.read<TodosBloc>().add(TodoAddEvent(todo));
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // Get reference to an already opened box
-    box = Hive.box('todosBox');
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // Get reference to an already opened box
+  //   box = Hive.box('todosBox');
+  // }
+
+  Widget _titleTextFormField() {
+    return TextFormField(
+      controller: _titleController,
+      validator: _fieldValidator,
+      decoration: const InputDecoration(
+          icon: Icon(Icons.title), labelText: 'Title', hintText: 'title todo'),
+    );
+  }
+
+  Widget _descriptionTextFormField() {
+    return TextFormField(
+      controller: _descriptionController,
+      validator: _fieldValidator,
+      maxLines: null,
+      decoration: const InputDecoration(
+        icon: Icon(Icons.description),
+        labelText: 'Description',
+        hintText: 'Description',
+      ),
+    );
+  }
+
+  Widget _heightSpacing(double valueHeight) {
+    return SizedBox(
+      height: valueHeight,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer(builder: (context, state) {
-      return const Text('ss');
-    }, listener: (context, state) {
-
-    });
-    return Scaffold(
-      backgroundColor: Colors.green,
-      appBar: AppBar(
-        title: const Text('Add Todo'),
-      ),
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _titleController,
-                validator: _fieldValidator,
-                decoration: const InputDecoration(
-                    icon: Icon(Icons.title),
-                    labelText: 'Title',
-                    hintText: 'title todo'),
-              ),
-              TextFormField(
-                controller: _descriptionController,
-                validator: _fieldValidator,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.description),
-                  labelText: 'Description',
-                  hintText: 'Description',
+    return BlocConsumer<TodosBloc, TodosState>(builder: (context, state) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Add Todo'),
+        ),
+        body: Center(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _titleTextFormField(),
+                Expanded(
+                  child: ListView.builder(
+                    itemBuilder: (context, index) =>
+                        _descriptionTextFormField(),
+                    itemCount: 1,
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              Wrap(
-                spacing: 16,
-                alignment: WrapAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Cancel'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _addTodo();
-                      Navigator.of(context).pop();
-                      if (_personFormKey.currentState!.validate()) {
+                _heightSpacing(16),
+                Wrap(
+                  spacing: 16,
+                  alignment: WrapAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
                         _addTodo();
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    child: const Text('Add'),
-                  ),
-                ],
-              ),
-            ],
+
+                        // if (_personFormKey.currentState!.validate()) {
+                        //   _addTodo();
+                        //   Navigator.of(context).pop();
+                        // }
+                      },
+                      child: const Text('Add'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }, listener: (context, state) {
+      if (state is TodosAddState) {
+        Navigator.of(context).pop();
+      }
+    });
   }
 }

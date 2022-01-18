@@ -4,19 +4,30 @@ import 'package:flutter_todos/todos/bloc/todos_bloc.dart';
 import 'package:flutter_todos/todos/models/todo_model.dart';
 import 'package:flutter_todos/todos/views/add_todo_page.dart';
 import 'package:flutter_todos/todos/views/detail_todo_page.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class TodosPage extends StatelessWidget {
   const TodosPage({Key? key}) : super(key: key);
 
+  static const routeName = 'TodosPage';
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => TodosBloc()..add(TodosLoadDataEvent()),
+      create: (_) => TodosBloc()..add(TodosLoadDataEvent()),
       child: BlocConsumer<TodosBloc, TodosState>(
         builder: (context, state) {
-          return const TodosView();
+          if (state is TodosLoadingDataState) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (state is TodosLoadDataSuccessState) {
+            return const TodosView();
+          }
+          return const Center(
+            child: Text('Empty'),
+          );
         },
         listener: (context, state) {},
       ),
@@ -36,17 +47,18 @@ class _TodosViewState extends State<TodosView> {
 
   // Delete info from people box
   _deleteInfo(int index) {
-    contactBox.deleteAt(index);
+    context.read<TodosBloc>().add(TodosDeleteEvent(index));
+    // contactBox.deleteAt(index);
 
     print('Item deleted from box at index: $index');
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // Get reference to an already opened box
-    contactBox = Hive.box('todosBox');
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // Get reference to an already opened box
+  //   contactBox = Hive.box('todosBox');
+  // }
 
   Widget _buildListView(Box box) {
     return ListView.builder(
@@ -61,7 +73,7 @@ class _TodosViewState extends State<TodosView> {
             MaterialPageRoute(
               builder: (context) => TodoDetailPage(
                 index: index,
-                person: todoData,
+                todo: todoData,
               ),
             ),
           ),
@@ -83,7 +95,10 @@ class _TodosViewState extends State<TodosView> {
       title: Text(
         todoData.title,
       ),
-      subtitle: Text(todoData.description),
+      subtitle: Text(
+        todoData.description,
+        maxLines: 1,
+      ),
       trailing: IconButton(
         onPressed: () => _deleteInfo(index),
         icon: const Icon(
@@ -100,26 +115,7 @@ class _TodosViewState extends State<TodosView> {
       appBar: AppBar(
         title: const Text('Todos'),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const AddTodoView(),
-          ),
-        ),
-        child: const Icon(Icons.add),
-      ),
-      body: ValueListenableBuilder(
-        valueListenable: contactBox.listenable(),
-        builder: (context, Box box, widget) {
-          if (box.isEmpty) {
-            return const Center(
-              child: Text('Empty'),
-            );
-          } else {
-            return _buildListView(box);
-          }
-        },
-      ),
+      body: _buildListView(context.read<TodosBloc>().box),
     );
   }
 }

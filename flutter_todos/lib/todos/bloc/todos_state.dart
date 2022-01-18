@@ -3,9 +3,9 @@ part of 'todos_bloc.dart';
 @immutable
 abstract class TodosState {}
 
-class TodosLoadDataState extends TodosState {}
+class TodosLoadingDataState extends TodosState {}
 
-class TodosLoadDataSstate extends TodosState {}
+class TodosLoadDataSuccessState extends TodosState {}
 
 class TodosAddState extends TodosState {
   final Todo? todo;
@@ -13,4 +13,8 @@ class TodosAddState extends TodosState {
   TodosAddState({this.todo});
 }
 
-class TodosChangeStatusState extends TodosState {}
+class TodosModifyState extends TodosState {}
+
+class TodosDeleteState extends TodosState {}
+
+

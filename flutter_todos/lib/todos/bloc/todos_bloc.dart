@@ -11,16 +11,20 @@ part 'todos_state.dart';
 
 class TodosBloc extends Bloc<TodosEvent, TodosState> {
   late final Box box;
-  List<Todo> todos = [];
 
-  TodosBloc() : super(TodosLoadDataState()) {
-    print('cdd run super TodosLoadDataState');
-    on<TodosLoadDataEvent>((event, emit) {
-      print('cdd run here when');
-      // TODO: implement event handler
-    });
+  TodosBloc() : super(TodosLoadingDataState()) {
+    on<TodosLoadDataEvent>(_loadingTodos);
     on<TodoAddEvent>(_addTodo);
-    on<TodoChangeStatusEvent>(_changeStatus);
+    on<TodosModifyEvent>(_modifyTodo);
+    on<TodosDeleteEvent>(_deleteTodo);
+  }
+
+  void _loadingTodos(TodosLoadDataEvent event, Emitter<TodosState> emit) async {
+    await Future.delayed(const Duration(seconds: 2), () {});
+
+    box = Hive.box('todosBox');
+
+    emit(TodosLoadDataSuccessState());
   }
 
   void _addTodo(TodoAddEvent event, Emitter<TodosState> emit) {
@@ -29,8 +33,18 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
     emit(TodosAddState(todo: todo));
   }
 
-  void _changeStatus(TodoChangeStatusEvent event, Emitter<TodosState> emit) {
-    // todos[event.index].isCompleted = !(todos[event.index].isCompleted!);
-    emit(TodosChangeStatusState());
+  void _modifyTodo(TodosModifyEvent event, Emitter<TodosState> emit) {
+    Todo newTodo = event.todo;
+    int index = event.index;
+
+    box.putAt(index, newTodo);
+
+    emit(TodosModifyState());
+  }
+
+  void _deleteTodo(TodosDeleteEvent event, Emitter<TodosState> emit) {
+    emit(TodosLoadingDataState());
+    box.deleteAt(event.index);
+    emit(TodosLoadDataSuccessState());
   }
 }

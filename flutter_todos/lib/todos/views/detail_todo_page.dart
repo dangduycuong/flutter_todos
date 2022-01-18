@@ -3,14 +3,16 @@ import 'package:flutter_todos/todos/models/todo_model.dart';
 import 'package:hive/hive.dart';
 
 class TodoDetailPage extends StatefulWidget {
+  static const routeName = 'TodoDetailPage';
+
   const TodoDetailPage({
     Key? key,
     required this.index,
-    required this.person,
+    required this.todo,
   }) : super(key: key);
 
   final int index;
-  final Todo person;
+  final Todo todo;
 
   @override
   _TodoDetailPageState createState() => _TodoDetailPageState();
@@ -28,7 +30,7 @@ class _TodoDetailPageState extends State<TodoDetailPage> {
         padding: const EdgeInsets.all(16.0),
         child: UpdateTodoForm(
           index: widget.index,
-          todo: widget.person,
+          todo: widget.todo,
         ),
       ),
     );
@@ -39,7 +41,8 @@ class UpdateTodoForm extends StatefulWidget {
   final int index;
   final Todo todo;
 
-  const UpdateTodoForm({Key? key,
+  const UpdateTodoForm({
+    Key? key,
     required this.index,
     required this.todo,
   }) : super(key: key);
@@ -62,7 +65,6 @@ class _UpdateTodoFormState extends State<UpdateTodoForm> {
     return null;
   }
 
-  // Update info of people box
   _updateTodo() {
     Todo newTodo = Todo(
       title: _titleController.text,
@@ -79,7 +81,29 @@ class _UpdateTodoFormState extends State<UpdateTodoForm> {
     // Get reference to an already opened box
     box = Hive.box('todosBox');
     _titleController = TextEditingController(text: widget.todo.title);
-    _descriptionController = TextEditingController(text: widget.todo.description);
+    _descriptionController =
+        TextEditingController(text: widget.todo.description);
+  }
+
+  Widget _cancelElevatedButton() {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+      child: const Text('Cancel'),
+    );
+  }
+
+  Widget _saveElevatedButton() {
+    return ElevatedButton(
+      onPressed: () {
+        if (_personFormKey.currentState!.validate()) {
+          _updateTodo();
+          Navigator.of(context).pop();
+        }
+      },
+      child: const Text('Save'),
+    );
   }
 
   @override
@@ -96,26 +120,33 @@ class _UpdateTodoFormState extends State<UpdateTodoForm> {
           ),
           const SizedBox(height: 24.0),
           const Text('Description'),
-          TextFormField(
-            controller: _descriptionController,
-            validator: _fieldValidator,
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return TextFormField(
+                    controller: _descriptionController,
+                    validator: _fieldValidator,
+                    maxLines: null,
+                  );
+                }
+                return Row(
+                  children: [
+                    Checkbox(value: true, onChanged: (value) {}),
+                    const Text('Completed'),
+                  ],
+                );
+              },
+              itemCount: 2,
+            ),
           ),
           const Spacer(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 24.0),
-            child: Container(
-              width: double.maxFinite,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (_personFormKey.currentState!.validate()) {
-                    _updateTodo();
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text('Update'),
-              ),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _cancelElevatedButton(),
+              _saveElevatedButton(),
+            ],
           ),
         ],
       ),
