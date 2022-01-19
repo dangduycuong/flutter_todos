@@ -39,7 +39,7 @@ class _AddTodoViewState extends State<AddTodoView> {
     return null;
   }
 
-  _addTodo() async {
+  _addTodo() {
     Todo todo = Todo(
       title: _titleController.text,
       description: _descriptionController.text,

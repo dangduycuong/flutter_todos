@@ -30,3 +30,13 @@ class TodosDeleteEvent extends TodosEvent {
 
   List<Object> get props => [index];
 }
+
+class TodosDetailEvent extends TodosEvent {
+  final int index;
+
+  TodosDetailEvent(this.index);
+
+  List<Object> get props => [index];
+}
+
+class TodoReloadDataEvent extends TodosEvent {}

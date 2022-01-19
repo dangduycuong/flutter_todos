@@ -36,7 +36,7 @@ class _HomePageBottomNavigationBarState
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const AddTodoView(),
+            builder: (context) => const AddTodoPage(),
           ),
         ),
         child: const Icon(Icons.add),
